@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-02-10 10:30:55
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-22 21:07:13
+ * @LastEditTime: 2024-02-23 16:55:07
  * @Description: 简介
  */
 import { getTextContent, getDateValue } from "notion-utils";
@@ -16,10 +16,10 @@ const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
 获取页面属性
 block、schema是整体的
 */
-async function getPageProperties(id, block, schema) {
+async function getPageProperties(id: any, block: any, schema: any) {
   const rawProperties = Object.entries(block?.[id]?.value?.properties || []);
   const excludeProperties = ["date", "select", "multi_select", "person"];
-  const properties = {};
+  const properties: any = {};
   for (let i = 0; i < rawProperties.length; i++) {
     const [key, val]: any = rawProperties[i];
     properties["id"] = id;
@@ -28,7 +28,7 @@ async function getPageProperties(id, block, schema) {
     } else {
       switch (schema[key]?.type) {
         case "date": {
-          const dateProperty = getDateValue(val);
+          const dateProperty: any = getDateValue(val);
           delete dateProperty.type;
           properties[schema[key].name] = dateProperty;
           break;
@@ -47,7 +47,7 @@ async function getPageProperties(id, block, schema) {
           for (let i = 0; i < rawUsers.length; i++) {
             if (rawUsers[i][0][1]) {
               const userId = rawUsers[i][0];
-              const res = await client.getUsers(userId);
+              const res: any = await client.getUsers(userId);
               const resValue =
                 res?.["recordMapWithRoles"]?.notion_user?.[userId[1]]?.value;
               const user = {
@@ -68,7 +68,7 @@ async function getPageProperties(id, block, schema) {
       }
     }
   }
-  
+
   return properties;
 }
 

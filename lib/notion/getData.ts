@@ -49,7 +49,6 @@ import "dayjs/locale/zh-cn";
 import relativeTime from "dayjs/plugin/relativeTime";
 import getAllPageIds from "./getAllPageIds";
 import getPageProperties from "./getPageProperties";
-import { setDataToCache, getDataFromCache } from "../cache";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -62,7 +61,7 @@ dayjs.locale("zh-cn");
  * @param pageNumber Current page number
  * @param pageSize Number of items per page
  */
-export function paginate(items, pageNumber, pageSize) {
+export function paginate(items: any, pageNumber: any, pageSize: any) {
   const startIndex = (pageNumber - 1) * pageSize;
   return items.slice(startIndex, startIndex + pageSize);
 }
@@ -77,7 +76,7 @@ export async function pagesStaticParam() {
   const response = await client.getPage(id);
   const collectionQuery = response.collection_query;
   const pageIds = getAllPageIds(collectionQuery);
-  return pageIds.map((post) => ({
+  return pageIds.map((post: any) => ({
     slug: post,
   }));
 }
@@ -95,7 +94,7 @@ export async function getMainUser() {
   const schema = collection?.schema;
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
-    const properties = (await getPageProperties(id, block, schema)) || null;
+    const properties: any = (await getPageProperties(id, block, schema)) || null;
     if (!properties["title"]) {
       continue;
     }
@@ -111,7 +110,7 @@ export async function getMainUser() {
  * @param source Source data to filter
  * @param type Type of posts to filter
  */
-export async function getAllPosts(item, source, type) {
+export async function getAllPosts(item: any, source: any, type: any) {
   function getLastTimeStr(time: string, friendly: boolean) {
     if (friendly) {
       return dayjs(time).fromNow().replace(" ", "");
@@ -119,7 +118,7 @@ export async function getAllPosts(item, source, type) {
     return dayjs(new Date(time)).format("YYYY-MM-DD HH:mm");
   }
 
-  const mapImgUrl = (img, block) => {
+  const mapImgUrl = (img: any, block: any) => {
     let ret = null;
 
     if (img.startsWith("/")) {
@@ -144,7 +143,7 @@ export async function getAllPosts(item, source, type) {
 
   switch (item) {
     case 1:
-      const posts = source.filter((post) => {
+      const posts = source.filter((post: any) => {
         return (
           post.title && post?.status?.[0] === "展现" && post?.type?.[0] === type
         );
@@ -159,12 +158,12 @@ export async function getAllPosts(item, source, type) {
       const users = response?.notion_user;
       const notion_users = [];
 
-      const collection = Object.values(response.collection)[0]?.["value"];
+      const collection: any = Object.values(response.collection)[0]?.["value"];
       const collectionQuery = response.collection_query;
       const block = response.block;
       const schema = collection?.schema;
       const rawMetadata = block[id].value;
-      const tagSchema = Object.values(schema);
+      const tagSchema: any = Object.values(schema);
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
@@ -181,7 +180,7 @@ export async function getAllPosts(item, source, type) {
 
         for (let i = 0; i < pageIds.length; i++) {
           const id = pageIds[i];
-          const properties =
+          const properties: any =
             (await getPageProperties(id, block, schema)) || null;
           if (!properties["title"]) {
             continue;
@@ -216,11 +215,11 @@ export async function getAllPosts(item, source, type) {
           }
 
           properties["tags"] =
-            properties?.["tags"]?.map((tag) => {
+            properties?.["tags"]?.map((tag: any) => {
               return {
                 name: tag,
                 color:
-                  tagOptions?.find((t) => t.value === tag)?.color || "gray",
+                  tagOptions?.find((t: any) => t.value === tag)?.color || "gray",
               };
             }) || [];
 
@@ -246,7 +245,7 @@ export async function getAllPosts(item, source, type) {
         };
 
         data.unshift(wiki);
-       // console.log(data);
+        // console.log(data);
         return data;
       }
   }

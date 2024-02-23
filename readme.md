@@ -1,94 +1,36 @@
-自豪地开源：<br/>[![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/kisrea-team/NoDrogen/blob/main/LICENSE)
-<img src="https://i0.imgs.ovh/2024/02/08/ba1c2.png" width="200" height="200">
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-# NoDrogen
-Nodrogen是使用Next.js开发、React-Notion-X渲染的Notion写作博客系统
+## Getting Started
 
-演示网站 https://nodrogen.vercel.app/
-## 实验性版本在[dev分支](https://github.com/kisrea-team/Notion-New/tree/dev)
-![预览](https://i0.imgs.ovh/2024/02/08/bapfO.png)
+First, run the development server:
 
-## 基本特性
-* Nodrogen支持几乎所有Notion的块。</br>最快每一个月一个二级版本，相同二级版本之间(1.2.x)都能任意兼容。
-* 核心大小仅300kb，专注于Notion内容渲染。
-* 重视SEO
-
-# 快速构建
-## 前提配置
-*星标该仓库*🤪
-
-* [Fork](https://github.com/kisrea-team/NoDrogen/fork)此仓库
-* 复制[Nodrogen模板](<https://www.notion.so/kisrea/1ac8cfb2dde44bbc8f6ed18d2acb1e3b?v=86c74e71bd524a29b5dc0fa1a1cf4fce>)并公之于众
-* 设置环境变量（使用Vercel部署时在Deloy之前设置）
-```.env.local
-PAGE_ID=98f7af9c0c8f403cab2e918b4aa630c0
-TWIKOO_ID=https://zitons-nodrogen.hf.space
-NEXT_PUBLIC_BLOG=https://zitons.kisrea.com/
-```
-`PAGE_ID`
-
-<details><summary>PAGE_ID在哪里？</summary>
-打码处就是啦
-  <img src="https://i0.imgs.ovh/2024/02/08/baeyd.png">
-</details>
-
-`TWIKOO_ID`
-
-用于调用评论系统
-
-`TWIKOO_ID`
-
-用于生成站点地图
-
-
-### 自有服务器
-
-```shell
-git clone http://github.com/kisrea-team/NoDrogen.git
-cd NoDrogen
-npm install --unsafe-perm
-npm run build
-npm run start
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Vercel
-## 注意：自d90dd87以后的版本，部署Vercel需要设置：
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-```
-NEXT_PUBLIC_BLOG
-```
-## 否则将编译失败。
-2.选择Next.js<br />
-![20240125153353](https://github.com/kisrea-team/NoDrogen/assets/49295983/c5d256f3-e56e-42e6-8d86-8aae1bfd63b8)<br />
-3.导入Git仓库<br />
-![20240125153544](https://github.com/kisrea-team/NoDrogen/assets/49295983/88e72d3a-de3e-408b-a1a0-aae5aad02b2f)<br />
-![20240125153808](https://github.com/kisrea-team/NoDrogen/assets/49295983/1c5ca88c-0e2b-476c-b2bd-7e2a2e8d9d41)<br />
-4.修改环境变量<br />
-![20240125161352](https://github.com/kisrea-team/NoDrogen/assets/49295983/01e78939-e269-47ca-886f-a0b2894e491a)
-5.Deloy
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### 静态导出
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-Nodrogen全面支持静态导出。
+## Learn More
 
-```shell
-npm run build
-```
+To learn more about Next.js, take a look at the following resources:
 
-可导出静态导出out文件夹。
-对于Nginx，可设置Nginx Rewrite以实现完美的路由。
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-```shell
-location / {
-  if (!-e $request_filename){
-      rewrite ^(.*)$ /$1.html last;
-      break;
-  }
-}
-```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## 致谢
+## Deploy on Vercel
 
-[React-Notion-X](https://github.com/NotionX/react-notion-x)
-[Nobelium](https://github.com/craigary/nobelium)
-[NotionNext](https://github.com/tangly1024/NotionNext)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
