@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-02-22 16:04:10
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-23 16:31:37
+ * @LastEditTime: 2024-02-23 17:56:36
  * @Description: 页面详细报告
  */
 
@@ -12,7 +12,6 @@ import dayjs from "dayjs";
 import { idToUuid, getBlockIcon } from "notion-utils";
 // import * as notion from '../../../lib/notion'
 // import postcss from 'postcss';
-import { getPageTitle, getPageProperty } from "notion-utils";
 import { pagesStaticParam } from "../../../../lib/notion/getData";
 import getAllPageIds from "../../../../lib/notion/getAllPageIds";
 
@@ -87,8 +86,6 @@ export async function GET(
   }
 
   data["icon"] = getBlockIcon(rawMetadata, recordMap);
-  data['mainTitle'] = collection["name"][0][0];
-  data["recordMap"] = recordMap;
 
   //获取第一个用户
   const id = idToUuid(process.env.PAGE_ID);
@@ -96,7 +93,13 @@ export async function GET(
   const response = await notion.getPage(id);
   const collectionQuery = response.collection_query;
   const pageIds = getAllPageIds(collectionQuery);
+  const users = response?.notion_user;
+  const scollection: any = Object.values(response.collection)[0]?.["value"];
 
+  let mainUser
+
+  const pageCover = mapImgUrl(scollection["cover"], rawMetadata);
+  const icon = mapImgUrl(scollection["icon"], rawMetadata);
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
     const properties: any = (await getPageProperties(id, block, schema)) || null;
@@ -104,10 +107,24 @@ export async function GET(
       continue;
     }
     if (properties["Person"]) {
-      data['mainUser'] = properties["Person"][0]["name"];
+      mainUser = properties["Person"][0]["name"];
       break;
     }
+
+
+
   }
 
-  return Response.json({ data })
+  const wiki = {
+    icon: icon,
+    cover: pageCover,
+    name: scollection["name"][0][0],
+    description: scollection["description"][0][0],
+    mainUser: mainUser,
+  };
+
+
+
+
+  return Response.json({ wiki, data, recordMap })
 }

@@ -167,7 +167,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
-
+      let mainUser
       if (
         rawMetadata?.type !== "collection_view_page" &&
         rawMetadata?.type !== "collection_view"
@@ -231,7 +231,11 @@ export async function getAllPosts(item: any, source: any, type: any) {
               notion_users.push(properties["Person"]);
             }
           }
-
+          let d
+          if (properties["Person"] && d) {
+            d = 0
+            mainUser = properties["Person"][0]["name"];
+          }
           data.push(properties);
         }
 
@@ -241,10 +245,34 @@ export async function getAllPosts(item: any, source: any, type: any) {
           cover: pageCover,
           name: collection["name"][0][0],
           description: collection["description"][0][0],
+          mainUser: mainUser,
           user: notion_users,
         };
 
+
+
+
+        //页数整理
+        const pagesCount = Math.ceil(data.filter((post: any) => {
+          return post?.type?.[0] != "精选";
+        }).length / 10); // 100/10
+        const pages = Array.from({ length: pagesCount }, (_, i) => i + 1);
+        const pageNumber = pages.map((post) => ({
+          slug: String(post),
+        }));
+
+
+
+        const pageId= pageIds.map((post: any) => ({
+          slug: post,
+        }));
+
+
+
+
         data.unshift(wiki);
+        data.unshift(pageId);
+        data.unshift(pageNumber);
         // console.log(data);
         return data;
       }
