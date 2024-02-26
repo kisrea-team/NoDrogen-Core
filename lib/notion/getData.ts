@@ -66,8 +66,6 @@ export function paginate(items: any, pageNumber: any, pageSize: any) {
   return items.slice(startIndex, startIndex + pageSize);
 }
 
-
-
 export async function pagesStaticParam() {
   const { NOTION_ACCESS_TOKEN } = process.env;
   const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
@@ -94,7 +92,8 @@ export async function getMainUser() {
   const schema = collection?.schema;
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
-    const properties: any = (await getPageProperties(id, block, schema)) || null;
+    const properties: any =
+      (await getPageProperties(id, block, schema)) || null;
     if (!properties["title"]) {
       continue;
     }
@@ -167,7 +166,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
-      let mainUser
+      let mainUser;
       if (
         rawMetadata?.type !== "collection_view_page" &&
         rawMetadata?.type !== "collection_view"
@@ -219,7 +218,8 @@ export async function getAllPosts(item: any, source: any, type: any) {
               return {
                 name: tag,
                 color:
-                  tagOptions?.find((t: any) => t.value === tag)?.color || "gray",
+                  tagOptions?.find((t: any) => t.value === tag)?.color ||
+                  "gray",
               };
             }) || [];
 
@@ -231,9 +231,9 @@ export async function getAllPosts(item: any, source: any, type: any) {
               notion_users.push(properties["Person"]);
             }
           }
-          let d
+          let d;
           if (properties["Person"] && d) {
-            d = 0
+            d = 0;
             mainUser = properties["Person"][0]["name"];
           }
           data.push(properties);
@@ -249,31 +249,27 @@ export async function getAllPosts(item: any, source: any, type: any) {
           user: notion_users,
         };
 
-
-
-
         //页数整理
-        const pagesCount = Math.ceil(data.filter((post: any) => {
-          return post?.type?.[0] != "精选";
-        }).length / 10); // 100/10
+        const pagesCount = Math.ceil(
+          data.filter((post: any) => {
+            return post?.type?.[0] != "精选";
+          }).length / 10
+        ); // 100/10
         const pages = Array.from({ length: pagesCount }, (_, i) => i + 1);
         const pageNumber = pages.map((post) => ({
           slug: String(post),
         }));
 
-
-
-        const pageId= pageIds.map((post: any) => ({
+        const pageId = pageIds.map((post: any) => ({
           slug: post,
         }));
 
-
-
+        console.log(block[id].value?.format?.page_cover, block[id].value);
 
         data.unshift(wiki);
         data.unshift(pageId);
         data.unshift(pageNumber);
-        // console.log(data);
+        console.log(data);
         return data;
       }
   }
