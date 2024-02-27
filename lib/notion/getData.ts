@@ -133,9 +133,9 @@ export async function getAllPosts(item: any, source: any, type: any) {
         "/image/" +
         encodeURIComponent(ret) +
         "?table=" +
-        "collection" +
+        "block" +
         "&id=" +
-        block.collection_id;
+        block.id;
     }
 
     return ret;
