@@ -1,8 +1,8 @@
 /*
  * @Author: zitons
  * @Date: 2024-02-22 16:04:10
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-23 17:56:36
+ * @LastEditors: vhko
+ * @LastEditTime: 2024-02-29 17:13:46
  * @Description: 页面详细报告
  */
 
@@ -30,22 +30,23 @@ const mapImgUrl = (img: any, block: any) => {
       "/image/" +
       encodeURIComponent(ret) +
       "?table=" +
-      "collection" +
+      "block" +
       "&id=" +
-      block.collection_id;
+      block.id;
   }
 
   return ret;
 };
+
 export async function generateStaticParams() {
-  return pagesStaticParam()
+  return pagesStaticParam();
 }
 
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  const slug = params.slug // 'a', 'b', or 'c'
+  const slug = params.slug; // 'a', 'b', or 'c'
   //获取页面信息
   let data: any;
   const notion = new NotionAPI();
@@ -77,10 +78,8 @@ export async function GET(
 
   if (block[slug].value?.format?.page_cover) {
     data["cover"] =
-      mapImgUrl(block[slug].value?.format?.page_cover, block[slug].value) ??
-      "";
-  }
-  else {
+      mapImgUrl(block[slug].value?.format?.page_cover, block[slug].value) ?? "";
+  } else {
     data["cover"] =
       "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
   }
@@ -96,13 +95,14 @@ export async function GET(
   const users = response?.notion_user;
   const scollection: any = Object.values(response.collection)[0]?.["value"];
 
-  let mainUser
+  let mainUser;
 
   const pageCover = mapImgUrl(scollection["cover"], rawMetadata);
   const icon = mapImgUrl(scollection["icon"], rawMetadata);
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
-    const properties: any = (await getPageProperties(id, block, schema)) || null;
+    const properties: any =
+      (await getPageProperties(id, block, schema)) || null;
     if (!properties["title"]) {
       continue;
     }
@@ -110,9 +110,6 @@ export async function GET(
       mainUser = properties["Person"][0]["name"];
       break;
     }
-
-
-
   }
 
   const wiki = {
@@ -123,8 +120,5 @@ export async function GET(
     mainUser: mainUser,
   };
 
-
-
-
-  return Response.json({ wiki, data, recordMap })
+  return Response.json({ wiki, data, recordMap });
 }
