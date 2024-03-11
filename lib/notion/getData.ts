@@ -66,18 +66,18 @@ export function paginate(items: any, pageNumber: any, pageSize: any) {
   return items.slice(startIndex, startIndex + pageSize);
 }
 
-export async function pagesStaticParam() {
-  const { NOTION_ACCESS_TOKEN } = process.env;
-  const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
-  const id = idToUuid(process.env.PAGE_ID);
-  //视图号
-  const response = await client.getPage(id);
-  const collectionQuery = response.collection_query;
-  const pageIds = getAllPageIds(collectionQuery);
-  return pageIds.map((post: any) => ({
-    slug: post,
-  }));
-}
+// export async function pagesStaticParam() {
+//   const { NOTION_ACCESS_TOKEN } = process.env;
+//   const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
+//   const id = idToUuid(process.env.PAGE_ID);
+//   //视图号
+//   const response = await client.getPage(id);
+//   const collectionQuery = response.collection_query;
+//   const pageIds = getAllPageIds(collectionQuery);
+//   return pageIds.map((post: any) => ({
+//     slug: post,
+//   }));
+// }
 
 export async function getMainUser() {
   const { NOTION_ACCESS_TOKEN } = process.env;
@@ -166,7 +166,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
-      
+
       const typeObj: any = [];
       let mainUser;
       if (
@@ -225,15 +225,12 @@ export async function getAllPosts(item: any, source: any, type: any) {
               };
             }) || [];
 
-
-           
-       
-            let filtered = typeObj.filter((item: any) => item == properties["type"]['0']);
-            if (filtered.length === 0) {
-                typeObj.push(properties["type"]['0']);
-            }
-            
-
+          let filtered = typeObj.filter(
+            (item: any) => item == properties["type"]["0"]
+          );
+          if (filtered.length === 0) {
+            typeObj.push(properties["type"]["0"]);
+          }
 
           if (properties["Person"]) {
             let filtered = notion_users.filter(
@@ -251,9 +248,6 @@ export async function getAllPosts(item: any, source: any, type: any) {
           data.push(properties);
         }
 
-
-        
-
         data = data.sort((objA, objB) => objB.start_date - objA.start_date);
         const wiki = {
           icon: icon,
@@ -264,6 +258,21 @@ export async function getAllPosts(item: any, source: any, type: any) {
           mainUser: mainUser,
           user: notion_users,
         };
+
+        if (item == 2) {
+          // js检查数组中是否包含某个元素
+          // 法一 indexOf
+          if (typeObj.indexOf(type) == -1) {
+            type = "404"
+          }
+          data = data.filter((post: any) => {
+            return (
+              post.title &&
+              post?.status?.[0] === "展现" &&
+              post?.type?.[0] === type
+            );
+          });
+        }
 
         //页数整理
         const pagesCount = Math.ceil(
