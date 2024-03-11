@@ -166,6 +166,8 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
+      
+      const typeObj: any = [];
       let mainUser;
       if (
         rawMetadata?.type !== "collection_view_page" &&
@@ -223,6 +225,16 @@ export async function getAllPosts(item: any, source: any, type: any) {
               };
             }) || [];
 
+
+           
+       
+            let filtered = typeObj.filter((item: any) => item == properties["type"]['0']);
+            if (filtered.length === 0) {
+                typeObj.push(properties["type"]['0']);
+            }
+            
+
+
           if (properties["Person"]) {
             let filtered = notion_users.filter(
               (item) => item.id !== properties["Person"].id
@@ -239,12 +251,16 @@ export async function getAllPosts(item: any, source: any, type: any) {
           data.push(properties);
         }
 
+
+        
+
         data = data.sort((objA, objB) => objB.start_date - objA.start_date);
         const wiki = {
           icon: icon,
           cover: pageCover,
           name: collection["name"][0][0],
           description: collection["description"][0][0],
+          type: typeObj,
           mainUser: mainUser,
           user: notion_users,
         };
@@ -264,7 +280,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
           slug: post,
         }));
 
-        console.log(block[id].value?.format?.page_cover, block[id].value);
+        // console.log(block[id].value?.format?.page_cover, block[id].value);
 
         data.unshift(wiki);
         data.unshift(pageId);
