@@ -1,8 +1,8 @@
 /*
  * @Author: zitons
  * @Date: 2024-02-22 16:04:10
- * @LastEditors: vhko
- * @LastEditTime: 2024-02-29 17:13:46
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2024-03-12 22:30:21
  * @Description: 页面详细报告
  */
 
@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { idToUuid, getBlockIcon } from "notion-utils";
 // import * as notion from '../../../lib/notion'
 // import postcss from 'postcss';
-import { pagesStaticParam } from "../../../../lib/notion/getData";
+// import { pagesStaticParam } from "../../../../lib/notion/getData";
 import getAllPageIds from "../../../../lib/notion/getAllPageIds";
 
 const mapImgUrl = (img: any, block: any) => {
@@ -38,9 +38,9 @@ const mapImgUrl = (img: any, block: any) => {
   return ret;
 };
 
-export async function generateStaticParams() {
-  return pagesStaticParam();
-}
+// export async function generateStaticParams() {
+//   return pagesStaticParam();
+// }
 
 export async function GET(
   request: Request,
@@ -99,6 +99,8 @@ export async function GET(
 
   const pageCover = mapImgUrl(scollection["cover"], rawMetadata);
   const icon = mapImgUrl(scollection["icon"], rawMetadata);
+  const typeObj: any = [];
+
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
     const properties: any =
@@ -110,6 +112,12 @@ export async function GET(
       mainUser = properties["Person"][0]["name"];
       break;
     }
+    let filtered = typeObj.filter(
+      (item: any) => item == properties["type"]["0"]
+    );
+    if (filtered.length === 0) {
+      typeObj.push(properties["type"]["0"]);
+    }
   }
 
   const wiki = {
@@ -117,6 +125,7 @@ export async function GET(
     cover: pageCover,
     name: scollection["name"][0][0],
     description: scollection["description"][0][0],
+    type: typeObj,
     mainUser: mainUser,
   };
 
