@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-02-22 14:00:52
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-03-11 16:50:38
+ * @LastEditTime: 2024-03-13 13:43:19
  * @Description: 简介
  */
 import { getAllPosts } from "../../../../lib/notion/getData";
@@ -17,6 +17,7 @@ export async function GET(
   const pageNumber = posts["0"];
   const pageId = posts["1"];
   const wiki = posts["2"];
-  posts = posts.slice(3);
-  return Response.json({ pageNumber, pageId, wiki, posts });
+  const typeNumer = posts["3"];
+  posts = posts.slice(4);
+  return Response.json({ pageNumber, pageId, typeNumer, wiki, posts });
 }

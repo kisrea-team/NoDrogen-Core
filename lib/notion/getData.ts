@@ -166,8 +166,11 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const tagOptions = tagSchema?.[3]?.["options"];
       const pageCover = mapImgUrl(collection["cover"], rawMetadata);
       const icon = mapImgUrl(collection["icon"], rawMetadata);
-
+      let typeNumber: any = [];
       const typeObj: any = [];
+      let typePages: any = [];
+      let typePagesCount;
+      let i: any;
       let mainUser;
       if (
         rawMetadata?.type !== "collection_view_page" &&
@@ -228,7 +231,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
           let filtered = typeObj.filter(
             (item: any) => item == properties["type"]["0"]
           );
-          if (filtered.length === 0) {
+          if (filtered.length === 0 && properties["type"]["0"] != "精选") {
             typeObj.push(properties["type"]["0"]);
           }
 
@@ -263,7 +266,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
           // js检查数组中是否包含某个元素
           // 法一 indexOf
           if (typeObj.indexOf(type) == -1) {
-            type = "404"
+            type = "404";
           }
           data = data.filter((post: any) => {
             return (
@@ -289,11 +292,28 @@ export async function getAllPosts(item: any, source: any, type: any) {
           slug: post,
         }));
 
+        for (i in typeObj) {
+          typePagesCount = Math.ceil(
+            data.filter((post: any) => {
+              return (
+                post?.type?.[0] != "精选" && post?.type?.[0] === typeObj[i]
+              );
+            }).length / 10
+          ); // 100/10
+          typePages = Array.from({ length: typePagesCount }, (_, i) => i + 1);
+          for (let j in typePages) {
+            const typeFilter = {
+              slug: [encodeURI(typeObj[i]), String(typePages[j])],
+            };
+            typeNumber.push(typeFilter);
+          }
+        }
         // console.log(block[id].value?.format?.page_cover, block[id].value);
-
+        data.unshift(typeNumber);
         data.unshift(wiki);
         data.unshift(pageId);
         data.unshift(pageNumber);
+
         console.log(data);
         return data;
       }
