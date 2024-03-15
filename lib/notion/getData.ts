@@ -157,6 +157,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
       const id = idToUuid(process.env.PAGE_ID);
       const response = await client.getPage(id);
+      console.log(response)
       const users = response.notion_user;
       const notion_users = [];
 
@@ -193,8 +194,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
             continue;
           }
 
-          properties["fullWidth"] =
-            block[id].value?.format?.page_full_width ?? false;
+
 
           properties["start_date"] = properties["date"]?.start_date
             ? dayjs(properties["date"]?.start_date).valueOf()
@@ -214,8 +214,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
 
           if (block[id].value?.format?.page_cover) {
             properties["cover"] =
-              mapImgUrl(block[id].value?.format?.page_cover, block[id].value) ??
-              "";
+              mapImgUrl(block[id].value?.format?.page_cover, block[id].value);
           } else {
             properties["cover"] =
               "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
@@ -317,7 +316,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
         data.unshift(pageId);
         data.unshift(pageNumber);
 
-        console.log(data);
+        // console.log(data);
         return data;
       }
   }
