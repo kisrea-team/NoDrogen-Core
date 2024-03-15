@@ -2,17 +2,7 @@ import { NotionAPI } from "notion-client";
 import { idToUuid, getPageContentBlockIds } from "notion-utils";
 import getAllPageIds from "./getAllPageIds";
 // import getPageProperties from "./getPageProperties";
-interface Post {
-  id: string;
-  date: string;
-  person: Object;
-  type: Object;
-  title: string;
-  status: object;
-  start_date: string;
-  cover: string;
-  tags: Object;
-}
+
 export class Nodrogen {
   response: any;
   pageIds: any;
@@ -45,9 +35,9 @@ export class Nodrogen {
 
     return ret;
   }
-//   constructor() {
-//     this.disp();
-//   }
+  //   constructor() {
+  //     this.disp();
+  //   }
   async disp(): Promise<void> {
     const { NOTION_ACCESS_TOKEN } = process.env;
     const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
@@ -68,33 +58,96 @@ export class Nodrogen {
     this.rawMetadata = this.block[id].value;
   }
 }
+const typeObj: any = [];
 
 export class Wiki extends Nodrogen {
   get(): void {
-    // const pageCover = obj.mapImgUrl(
-    //   this.collection[0]["value"]["cover"],
-    //   this.rawMetadata
-    // );
-    
-    // const icon = this.mapImgUrl(this.collection[0]["value"], this.rawMetadata);
-    // const rawProperties: any = Object.entries(
-    //   this.collection[0]["value"]["schema"] || []
-    // );
-    // for (let i = 0; i < rawProperties.length; i++) {
-    //   console.log(rawProperties[i]["name"]);
-    // }
-    console.log(this.block)
-    // const wiki = {
-    //   icon: icon,
-    //   cover: pageCover,
-    //   name: this.collection[0]["value"]["name"][0][0],
-    //   description: this.collection[0]["value"]["description"][0][0],
-    //   type: typeObj,
-    //   mainUser: mainUser,
-    //   user: notion_users,
-    // };
+    const pageCover = this.mapImgUrl(
+      this.collection[0]["value"]["cover"],
+      this.rawMetadata
+    );
+
+    const icon = this.mapImgUrl(
+      this.collection[0]["value"]["icon"],
+      this.rawMetadata
+    );
+    const rawProperties: any = Object.entries(
+      this.collection[0]["value"]["schema"] || []
+    );
+    for (let i = 0; i < rawProperties.length; i++) {
+      if (rawProperties[i][1]["name"] == "type") {
+      
+        for (let j = 0; j < rawProperties[i][1]["options"].length; j++) {
+          typeObj.push(rawProperties[i][1]["options"][j]["value"]);
+        }
+
+        break;
+      }
+    }
+    const wiki = {
+      icon: icon,
+      cover: pageCover,
+      name: this.collection[0]["value"]["name"][0][0],
+      description: this.collection[0]["value"]["description"][0][0],
+      type: typeObj,
+      // main_user: mainUser,
+      // user: notion_users,
+    };
+    console.log(wiki)
   }
+  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+export class Posts extends Nodrogen {
+  get(): void {
+    const pageCover = this.mapImgUrl(
+      this.collection[0]["value"]["cover"],
+      this.rawMetadata
+    );
+
+    const icon = this.mapImgUrl(
+      this.collection[0]["value"]["icon"],
+      this.rawMetadata
+    );
+    const rawProperties: any = Object.entries(
+      this.collection[0]["value"]["schema"] || []
+    );
+    for (let i = 0; i < rawProperties.length; i++) {
+      if (rawProperties[i][1]["name"] == "type") {
+      
+        for (let j = 0; j < rawProperties[i][1]["options"].length; j++) {
+          typeObj.push(rawProperties[i][1]["options"][j]["value"]);
+        }
+
+        break;
+      }
+    }
+    const wiki = {
+      icon: icon,
+      cover: pageCover,
+      name: this.collection[0]["value"]["name"][0][0],
+      description: this.collection[0]["value"]["description"][0][0],
+      type: typeObj,
+      // main_user: mainUser,
+      // user: notion_users,
+    };
+    console.log(wiki)
+  }
+  
+}
+
+
 
 // export async function getPostInfo<T extends Post>(Post: T) {
 //   const { NOTION_ACCESS_TOKEN } = process.env;

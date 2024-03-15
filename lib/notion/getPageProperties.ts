@@ -2,13 +2,12 @@
  * @Author: zitons
  * @Date: 2024-02-10 10:30:55
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-23 16:55:07
+ * @LastEditTime: 2024-03-15 17:38:48
  * @Description: 简介
  */
 import { getTextContent, getDateValue } from "notion-utils";
 import { NotionAPI } from "notion-client";
 // import { Decoration } from "notion-types";
-
 const { NOTION_ACCESS_TOKEN } = process.env;
 
 const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
@@ -28,8 +27,9 @@ async function getPageProperties(id: any, block: any, schema: any) {
     } else {
       switch (schema[key]?.type) {
         case "date": {
-          const dateProperty: any = getDateValue(val);
-          delete dateProperty.type;
+          let dateProperty: any =
+            getDateValue(val);
+          // delete dateProperty.type;
           properties[schema[key].name] = dateProperty;
           break;
         }
