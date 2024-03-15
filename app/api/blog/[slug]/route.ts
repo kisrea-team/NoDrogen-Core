@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-02-22 16:04:10
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-03-12 22:30:21
+ * @LastEditTime: 2024-03-15 09:41:32
  * @Description: 页面详细报告
  */
 
@@ -17,7 +17,9 @@ import getAllPageIds from "../../../../lib/notion/getAllPageIds";
 
 const mapImgUrl = (img: any, block: any) => {
   let ret = null;
-
+  if (!img) {
+    return "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
+  }
   if (img.startsWith("/")) {
     ret = "https://www.notion.so" + img;
   } else {
@@ -64,9 +66,9 @@ export async function GET(
   // )properties
 
   const tagSchema = Object.values(schema);
-  const tagOptions = tagSchema?.[3]?.["options"];
+  const tagOptions = tagSchema[3]?.["options"];
   data["tags"] =
-    data?.["tags"]?.map((tag: any) => {
+    data["tags"]?.map((tag: any) => {
       return {
         name: tag,
         color: tagOptions?.find((t) => t.value === tag)?.color || "gray",
@@ -78,7 +80,10 @@ export async function GET(
 
   if (block[slug].value?.format?.page_cover) {
     data["cover"] =
-      mapImgUrl(block[slug].value?.format?.page_cover, block[slug].value) ?? "";
+      mapImgUrl(
+        block[slug].value?.format?.page_cover ?? "",
+        block[slug].value
+      );
   } else {
     data["cover"] =
       "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
@@ -92,20 +97,19 @@ export async function GET(
   const response = await notion.getPage(id);
   const collectionQuery = response.collection_query;
   const pageIds = getAllPageIds(collectionQuery);
-  const users = response?.notion_user;
+  const users = response.notion_user;
   const scollection: any = Object.values(response.collection)[0]?.["value"];
 
   let mainUser;
-
-  const pageCover = mapImgUrl(scollection["cover"], rawMetadata);
-  const icon = mapImgUrl(scollection["icon"], rawMetadata);
+  const pageCover = mapImgUrl(scollection?.["cover"], rawMetadata);
+  const icon = mapImgUrl(scollection?.["icon"], rawMetadata);
   const typeObj: any = [];
 
   for (let i = 0; i < pageIds.length; i++) {
     const id = pageIds[i];
     const properties: any =
       (await getPageProperties(id, block, schema)) || null;
-    if (!properties["title"]) {
+    if (!properties?.["title"]) {
       continue;
     }
     if (properties["Person"]) {
@@ -123,8 +127,8 @@ export async function GET(
   const wiki = {
     icon: icon,
     cover: pageCover,
-    name: scollection["name"][0][0],
-    description: scollection["description"][0][0],
+    name: scollection?.["name"][0][0],
+    description: scollection?.["description"][0][0],
     type: typeObj,
     mainUser: mainUser,
   };

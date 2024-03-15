@@ -79,6 +79,32 @@ export function paginate(items: any, pageNumber: any, pageSize: any) {
 //   }));
 // }
 
+
+const mapImgUrl = (img: any, block: any) => {
+  let ret = null;
+  if (!img) {
+    return "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
+  }
+  if (img.startsWith("/")) {
+    ret = "https://www.notion.so" + img;
+  } else {
+    ret = img;
+  }
+
+  if (ret.indexOf("amazonaws.com") > 0) {
+    ret =
+      "https://www.notion.so" +
+      "/image/" +
+      encodeURIComponent(ret) +
+      "?table=" +
+      "block" +
+      "&id=" +
+      block.id;
+  }
+
+  return ret;
+};
+
 export async function getMainUser() {
   const { NOTION_ACCESS_TOKEN } = process.env;
   const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
@@ -94,7 +120,7 @@ export async function getMainUser() {
     const id = pageIds[i];
     const properties: any =
       (await getPageProperties(id, block, schema)) || null;
-    if (!properties["title"]) {
+    if (!properties?.["title"]) {
       continue;
     }
     if (properties["Person"]) {
@@ -117,34 +143,11 @@ export async function getAllPosts(item: any, source: any, type: any) {
     return dayjs(new Date(time)).format("YYYY-MM-DD HH:mm");
   }
 
-  const mapImgUrl = (img: any, block: any) => {
-    let ret = null;
-
-    if (img.startsWith("/")) {
-      ret = "https://www.notion.so" + img;
-    } else {
-      ret = img;
-    }
-
-    if (ret.indexOf("amazonaws.com") > 0) {
-      ret =
-        "https://www.notion.so" +
-        "/image/" +
-        encodeURIComponent(ret) +
-        "?table=" +
-        "block" +
-        "&id=" +
-        block.id;
-    }
-
-    return ret;
-  };
-
   switch (item) {
     case 1:
       const posts = source.filter((post: any) => {
         return (
-          post.title && post?.status?.[0] === "展现" && post?.type?.[0] === type
+          post?.title && post?.status?.[0] === "展现" && post?.type?.[0] === type
         );
       });
       return posts;
@@ -154,7 +157,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
       const id = idToUuid(process.env.PAGE_ID);
       const response = await client.getPage(id);
-      const users = response?.notion_user;
+      const users = response.notion_user;
       const notion_users = [];
 
       const collection: any = Object.values(response.collection)[0]?.["value"];
@@ -164,8 +167,8 @@ export async function getAllPosts(item: any, source: any, type: any) {
       const rawMetadata = block[id].value;
       const tagSchema: any = Object.values(schema);
       const tagOptions = tagSchema?.[3]?.["options"];
-      const pageCover = mapImgUrl(collection["cover"], rawMetadata);
-      const icon = mapImgUrl(collection["icon"], rawMetadata);
+      const pageCover = mapImgUrl(collection?.["cover"], rawMetadata);
+      const icon = mapImgUrl(collection?.["icon"], rawMetadata);
       let typeNumber: any = [];
       const typeObj: any = [];
       let typePages: any = [];
@@ -186,7 +189,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
           const id = pageIds[i];
           const properties: any =
             (await getPageProperties(id, block, schema)) || null;
-          if (!properties["title"]) {
+          if (!properties?.["title"]) {
             continue;
           }
 
@@ -270,7 +273,7 @@ export async function getAllPosts(item: any, source: any, type: any) {
           }
           data = data.filter((post: any) => {
             return (
-              post.title &&
+              post?.title &&
               post?.status?.[0] === "展现" &&
               post?.type?.[0] === type
             );
