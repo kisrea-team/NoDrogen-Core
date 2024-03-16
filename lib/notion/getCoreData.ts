@@ -16,6 +16,8 @@ export class Nodrogen {
   collectionQuery: any;
   posts: any;
   type: any;
+  tagObj: any;
+  mainUser: any = [];
   mapImgUrl(img: any, block: any): string {
     let ret = null;
     if (!img) {
@@ -43,7 +45,7 @@ export class Nodrogen {
   //   constructor() {
   //     this.disp();
   //   }
-  async disp(): Promise<void> {
+  async disp(): Promise<any> {
     const { NOTION_ACCESS_TOKEN } = process.env;
     this.client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
     const id = idToUuid("aa045af321034b62ad9c962b42fe7f48");
@@ -66,12 +68,22 @@ export class Nodrogen {
     const rawProperties: any = Object.entries(
       this.collection[0]["value"]["schema"] || []
     );
+    let q: number = 0;
+
     for (let i = 0; i < rawProperties.length; i++) {
       if (rawProperties[i][1]["name"] == "type") {
+        q++;
         for (let j = 0; j < rawProperties[i][1]["options"].length; j++) {
           this.typeObj.push(rawProperties[i][1]["options"][j]["value"]);
         }
         this.typeName = rawProperties[i][0];
+        // break;
+      }
+      if (rawProperties[i][1]["name"] == "tags") {
+        this.tagObj = rawProperties[i][1]["options"];
+        q++;
+      }
+      if (q >= 2) {
         break;
       }
     }
@@ -79,7 +91,7 @@ export class Nodrogen {
 }
 
 export class Notion extends Nodrogen {
-  getWiki(): void {
+  getWiki(): any {
     const pageCover = this.mapImgUrl(
       this.collection[0]["value"]["cover"],
       this.rawMetadata
@@ -100,10 +112,10 @@ export class Notion extends Nodrogen {
       // main_user: mainUser,
       // user: notion_users,
     };
-    console.log(wiki);
+    return wiki;
   }
 
-  async getPost(id: any): Promise<void> {
+  async getPost(id: any): Promise<any[]> {
     const rawProperties = Object.entries(
       this.block?.[id]?.value?.properties || []
     );
@@ -121,7 +133,7 @@ export class Notion extends Nodrogen {
         properties[this.collection[0]["value"]["schema"][key].name] =
           getTextContent(val);
       } else {
-        switch (this.collection[0]["value"]["schema"]?.type) {
+        switch (this.collection[0]["value"]["schema"][key]?.type) {
           case "date": {
             let dateProperty: any = getDateValue(val);
             // delete dateProperty.type;
@@ -165,7 +177,22 @@ export class Notion extends Nodrogen {
         }
       }
     }
+    if (this.block[id].value?.format?.page_icon) {
+      properties["icon"] = this.mapImgUrl(
+        this.block[id].value?.format?.page_icon,
+        this.block[id].value
+      );
+    }
 
+    if (this.block[id].value?.format?.page_cover) {
+      properties["cover"] = this.mapImgUrl(
+        this.block[id].value?.format?.page_cover,
+        this.block[id].value
+      );
+    } else {
+      properties["cover"] =
+        "https://www.notion.so/images/page-cover/met_fitz_henry_lane.jpg";
+    }
     return properties;
   }
 
@@ -193,9 +220,10 @@ export class Notion extends Nodrogen {
     });
     pageIds = [...pageSet];
     postsT = [...posts];
+    // const mainUser = postsT.find((element) => element > 10);
 
     let filterPosts = postsT.sort(
-      (objA, objB) =>
+      (objA: any, objB: any) =>
         objB?.["value"]["created_time"] - objA?.["value"]["created_time"]
     );
     const result = filterPosts.filter(
@@ -210,18 +238,24 @@ export class Notion extends Nodrogen {
     }
     filterPosts = this.paginate(this.posts, Number(slug), 10);
 
+
     for (let i = 0; i < filterPosts.length; i++) {
       // console.log(await this.getPost(filterPosts[i]["value"]["id"]))
-      postsF.push(await this.getPost(filterPosts[i]["value"]["id"]));
+      let pageInfo: any = await this.getPost(filterPosts[i]["value"]["id"]);
+      postsF.push(pageInfo);
     }
-    // console.log(await getPageProperties("5fe60377-b3c1-4ede-b3e2-8bc4d312a893",this.block,this.collection[0]["value"]["schema"]))
 
+    const found = postsF.find((element) => element["Person"]);
+
+    this.mainUser = found["Person"];
+
+    // console.log(await getPageProperties("5fe60377-b3c1-4ede-b3e2-8bc4d312a893",this.block,this.collection[0]["value"]["schema"]))
     return postsF;
   }
 
   getPage(): any {
     let pagesCount: any, pageNumber: any;
-   
+
     pagesCount = Math.ceil(this.posts.length / 10); // 100/10
     const pages = Array.from({ length: pagesCount }, (_, i) => i + 1);
     pageNumber = pages.map((post) => ({
@@ -231,32 +265,3 @@ export class Notion extends Nodrogen {
     return [pagesCount, pageNumber];
   }
 }
-
-// export async function getPostInfo<T extends Post>(Post: T) {
-//   const { NOTION_ACCESS_TOKEN } = process.env;
-//   const client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
-//   const id = idToUuid(process.env.PAGE_ID);
-//   //视图号
-//   const response = await client.getPage(id);
-//   const collectionQuery = response.collection_query;
-//   const pageIds = getAllPageIds(collectionQuery);
-//   const block = response.block;
-//   const collection = Object.values(response.collection)[0]?.["value"];
-//   const schema = collection?.schema;
-//   //   const types = await getPageContentBlockIds(response, id);
-//   //   for(const key in Post)
-//   //   {
-//   //     console.log(key,Post[key])
-//   //   }
-//   // for (let i = 0; i < pageIds.length; i++) {
-//   //   const id = pageIds[i];
-//   //   const properties: any =
-//   //     (await getPageProperties(id, block, schema)) || null;
-//   //   if (!properties?.["title"]) {
-//   //     continue;
-//   //   }
-//   //   if (properties["Person"]) {
-//   //     return properties["Person"][0]["name"];
-//   //   }
-//   // }
-// }
