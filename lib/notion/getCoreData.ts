@@ -1,7 +1,7 @@
 import { NotionAPI } from "notion-client";
 import { idToUuid, getTextContent, getDateValue } from "notion-utils";
-import getAllPageIds from "./getAllPageIds";
-import getPageProperties from "./getPageProperties";
+// import getAllPageIds from "./getAllPageIds";
+// import getPageProperties from "./getPageProperties";
 
 export class Nodrogen {
   response: any;
@@ -48,7 +48,8 @@ export class Nodrogen {
   async disp(): Promise<any> {
     const { NOTION_ACCESS_TOKEN } = process.env;
     this.client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
-    const id = idToUuid("aa045af321034b62ad9c962b42fe7f48");
+    const id = idToUuid("98f7af9c0c8f403cab2e918b4aa630c0");
+    //  const id = idToUuid(process.env.PAGE_ID);
     //视图号
     try {
       this.response = await this.client.getPage(id);
@@ -237,7 +238,6 @@ export class Notion extends Nodrogen {
       );
     }
     filterPosts = this.paginate(this.posts, Number(slug), 10);
-
 
     for (let i = 0; i < filterPosts.length; i++) {
       // console.log(await this.getPost(filterPosts[i]["value"]["id"]))
