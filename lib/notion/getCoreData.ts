@@ -1,7 +1,6 @@
 import { NotionAPI } from "notion-client";
 import { idToUuid, getTextContent, getDateValue } from "notion-utils";
-// import getAllPageIds from "./getAllPageIds";
-// import getPageProperties from "./getPageProperties";
+
 
 export class Nodrogen {
   response: any;
