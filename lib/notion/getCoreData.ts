@@ -1,7 +1,6 @@
 import { NotionAPI } from "notion-client";
 import { idToUuid, getTextContent, getDateValue } from "notion-utils";
 
-
 export class Nodrogen {
   response: any;
   pageIds: any;
@@ -48,17 +47,17 @@ export class Nodrogen {
     const { NOTION_ACCESS_TOKEN } = process.env;
     this.client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
     // const id = idToUuid("98f7af9c0c8f403cab2e918b4aa630c0");
-     const id = idToUuid(process.env.PAGE_ID);
+    const id = idToUuid(process.env.PAGE_ID);
     //视图号
     try {
       this.response = await this.client.getPage(id);
-      // console.log(this.response)
+      console.log(this.response);
       // 处理结果
     } catch (error) {
       // 处理错误
-      console.log(error)
+      console.log(error);
     }
-    
+
     this.collectionQuery = this.response.collection_query;
 
     this.block = this.response.block;
@@ -71,7 +70,7 @@ export class Nodrogen {
       this.collection[0]["value"]["schema"] || []
     );
     let q: number = 0;
-
+    console.log(rawProperties);
     for (let i = 0; i < rawProperties.length; i++) {
       if (rawProperties[i][1]["name"] == "type") {
         q++;
@@ -81,11 +80,14 @@ export class Nodrogen {
         this.typeName = rawProperties[i][0];
         // break;
       }
+      if (rawProperties[i][1]["name"] == "date") {
+        q++;
+      }
       if (rawProperties[i][1]["name"] == "tags") {
         this.tagObj = rawProperties[i][1]["options"];
         q++;
       }
-      if (q >= 2) {
+      if (q >= 3) {
         break;
       }
     }
@@ -114,6 +116,7 @@ export class Notion extends Nodrogen {
       // main_user: mainUser,
       // user: notion_users,
     };
+    console.log(Notion);
     return wiki;
   }
 
@@ -208,7 +211,7 @@ export class Notion extends Nodrogen {
 
     //获取所有pageid
     const views = Object.values(this.collectionQuery)[0] as any;
-
+    console.log(views);
     let pageIds = [];
     let postsT: any[] = [];
     let postsF: any[] = [];
