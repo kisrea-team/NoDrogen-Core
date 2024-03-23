@@ -47,18 +47,15 @@ export class Nodrogen {
   async disp(): Promise<any> {
     const { NOTION_ACCESS_TOKEN } = process.env;
     this.client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
-    // const id = idToUuid("98f7af9c0c8f403cab2e918b4aa630c0");
-     const id = idToUuid(process.env.PAGE_ID);
+    const id = idToUuid("aa045af321034b62ad9c962b42fe7f48");
     //视图号
     try {
       this.response = await this.client.getPage(id);
-      // console.log(this.response)
+
       // 处理结果
     } catch (error) {
       // 处理错误
-      console.log(error)
     }
-    
     this.collectionQuery = this.response.collection_query;
 
     this.block = this.response.block;
@@ -229,16 +226,17 @@ export class Notion extends Nodrogen {
         objB?.["value"]["created_time"] - objA?.["value"]["created_time"]
     );
     const result = filterPosts.filter(
-      (post: any) => post["value"]["properties"]?.[this.typeName]?.[0] == "精选"
+      (post: any) => post["value"]["properties"][this.typeName][0] == "精选"
     );
     this.posts = result.concat(filterPosts);
     if (this.type) {
       this.posts = this.posts.filter(
         (post: any) =>
-          post["value"]["properties"]?.[this.typeName]?.[0] == this.type
+          post["value"]["properties"][this.typeName][0] == this.type
       );
     }
     filterPosts = this.paginate(this.posts, Number(slug), 10);
+
 
     for (let i = 0; i < filterPosts.length; i++) {
       // console.log(await this.getPost(filterPosts[i]["value"]["id"]))
