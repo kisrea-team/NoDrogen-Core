@@ -11,6 +11,7 @@ export class Nodrogen {
   client: any;
   typeObj: any = [];
   typeName: any;
+  dateName: any;
   collectionQuery: any;
   posts: any;
   type: any;
@@ -51,7 +52,7 @@ export class Nodrogen {
     //视图号
     try {
       this.response = await this.client.getPage(id);
-      console.log(this.response);
+    //  console.log(this.response);
       // 处理结果
     } catch (error) {
       // 处理错误
@@ -70,7 +71,7 @@ export class Nodrogen {
       this.collection[0]["value"]["schema"] || []
     );
     let q: number = 0;
-    console.log(rawProperties);
+    //console.log(rawProperties);
     for (let i = 0; i < rawProperties.length; i++) {
       if (rawProperties[i][1]["name"] == "type") {
         q++;
@@ -81,6 +82,7 @@ export class Nodrogen {
         // break;
       }
       if (rawProperties[i][1]["name"] == "date") {
+        this.dateName = rawProperties[i][0];
         q++;
       }
       if (rawProperties[i][1]["name"] == "tags") {
@@ -113,10 +115,11 @@ export class Notion extends Nodrogen {
       description: this.collection[0]["value"]["description"][0][0],
       type: this.typeObj,
       star: this.typeName,
+      date: this.dateName,
       // main_user: mainUser,
       // user: notion_users,
     };
-    console.log(Notion);
+    //console.log(Notion);
     return wiki;
   }
 
@@ -211,7 +214,7 @@ export class Notion extends Nodrogen {
 
     //获取所有pageid
     const views = Object.values(this.collectionQuery)[0] as any;
-    console.log(views);
+    //console.log(views);
     let pageIds = [];
     let postsT: any[] = [];
     let postsF: any[] = [];
@@ -229,7 +232,12 @@ export class Notion extends Nodrogen {
 
     let filterPosts = postsT.sort(
       (objA: any, objB: any) =>
-        objB?.["value"]["created_time"] - objA?.["value"]["created_time"]
+        new Date(
+          objB?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
+        ).getTime() -
+        new Date(
+          objA?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
+        ).getTime()
     );
     const result = filterPosts.filter(
       (post: any) => post["value"]["properties"]?.[this.typeName]?.[0] == "精选"
