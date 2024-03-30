@@ -7,6 +7,7 @@ export class Nodrogen {
   block: any;
   collection: any;
   schema: any;
+  tagOptions:any;
   rawMetadata: any;
   client: any;
   typeObj: any = [];
@@ -66,9 +67,12 @@ export class Nodrogen {
     // this.schema = this.collection.schema;
     this.rawMetadata = this.block[id].value;
 
+
+    const tagSchema: any = Object.values(this.collection[0]["value"]["schema"]);
+    this.tagOptions = tagSchema[3]?.["options"];
     //获取type地址
     const rawProperties: any = Object.entries(
-      this.collection[0]["value"]["schema"] || []
+      this.collection[0]["value"]["schema"]
     );
     let q: number = 0;
     //console.log(rawProperties);
@@ -185,6 +189,15 @@ export class Notion extends Nodrogen {
         }
       }
     }
+    properties["tags"] =
+    properties["tags"]?.map((tag: any) => {
+      return {
+        name: tag,
+        color:
+          this.tagOptions?.find((t: any) => t.value === tag)?.color ||
+          "gray",
+      };
+    }) || [];
     if (this.block[id].value?.format?.page_icon) {
       properties["icon"] = this.mapImgUrl(
         this.block[id].value?.format?.page_icon,
