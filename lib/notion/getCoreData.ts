@@ -7,7 +7,7 @@ export class Nodrogen {
   block: any;
   collection: any;
   schema: any;
-  tagOptions:any;
+  tagOptions: any;
   rawMetadata: any;
   client: any;
   typeObj: any = [];
@@ -45,6 +45,15 @@ export class Nodrogen {
   //   constructor() {
   //     this.disp();
   //   }
+  // getRepeatNum(arr: any) {
+  //   var obj: any = {};
+  //   for (var i = 0, l = 10; i < l; i++) {
+  //     var item = arr[i]["value"]["properties"][this.dateName][0][1][0][1]["start_date"].getFullYear();
+  //     obj[item] = obj[item] + 1 || 1;
+  //   }
+  //   return obj;
+  // }
+
   async disp(): Promise<any> {
     const { NOTION_ACCESS_TOKEN } = process.env;
     this.client = new NotionAPI({ authToken: NOTION_ACCESS_TOKEN });
@@ -53,7 +62,7 @@ export class Nodrogen {
     //视图号
     try {
       this.response = await this.client.getPage(id);
-    //  console.log(this.response);
+      //  console.log(this.response);
       // 处理结果
     } catch (error) {
       // 处理错误
@@ -66,7 +75,6 @@ export class Nodrogen {
     this.collection = Object.values(this.response.collection);
     // this.schema = this.collection.schema;
     this.rawMetadata = this.block[id].value;
-
 
     const tagSchema: any = Object.values(this.collection[0]["value"]["schema"]);
     this.tagOptions = tagSchema[3]?.["options"];
@@ -190,14 +198,13 @@ export class Notion extends Nodrogen {
       }
     }
     properties["tags"] =
-    properties["tags"]?.map((tag: any) => {
-      return {
-        name: tag,
-        color:
-          this.tagOptions?.find((t: any) => t.value === tag)?.color ||
-          "gray",
-      };
-    }) || [];
+      properties["tags"]?.map((tag: any) => {
+        return {
+          name: tag,
+          color:
+            this.tagOptions?.find((t: any) => t.value === tag)?.color || "gray",
+        };
+      }) || [];
     if (this.block[id].value?.format?.page_icon) {
       properties["icon"] = this.mapImgUrl(
         this.block[id].value?.format?.page_icon,
@@ -256,26 +263,53 @@ export class Notion extends Nodrogen {
       (post: any) => post["value"]["properties"]?.[this.typeName]?.[0] == "精选"
     );
     this.posts = result.concat(filterPosts);
-    if (this.type) {
+    if (this.type && this.type == "1") {
+      this.posts = filterPosts;
+      //去掉精选项目
+    }
+    if (this.type && this.type != "1") {
       this.posts = this.posts.filter(
         (post: any) =>
           post["value"]["properties"]?.[this.typeName]?.[0] == this.type
       );
     }
-    filterPosts = this.paginate(this.posts, Number(slug), 10);
 
+    filterPosts = this.paginate(this.posts, Number(slug), 10);
+    var obj: any = {};
+    var years: any = [];
     for (let i = 0; i < filterPosts.length; i++) {
       // console.log(await this.getPost(filterPosts[i]["value"]["id"]))
-      let pageInfo: any = await this.getPost(filterPosts[i]["value"]["id"]);
-      postsF.push(pageInfo);
+
+      if (this.type && this.type == "1") {
+        var item = new Date(
+          filterPosts[i]["value"]["properties"][this.dateName][0][1][0][1][
+            "start_date"
+          ]
+        ).getFullYear();
+        var year = item.toString();
+        obj[item] = obj[item] + 1 || 1;
+        years["2077"] = obj;
+        if (obj[item] == 1) {
+          years[year] = [];
+        }
+        let pageInfo: any = await this.getPost(filterPosts[i]["value"]["id"]);
+
+        years[year].push(pageInfo);
+      } else {
+        let pageInfo: any = await this.getPost(filterPosts[i]["value"]["id"]);
+        postsF.push(pageInfo);
+      }
     }
+    if (this.type && this.type == "1") {
+      return years;
+    } else {
+      const found = postsF.find((element) => element["Person"]);
 
-    const found = postsF.find((element) => element["Person"]);
+      this.mainUser = found["Person"];
 
-    this.mainUser = found["Person"];
-
-    // console.log(await getPageProperties("5fe60377-b3c1-4ede-b3e2-8bc4d312a893",this.block,this.collection[0]["value"]["schema"]))
-    return postsF;
+      // console.log(await getPageProperties("5fe60377-b3c1-4ede-b3e2-8bc4d312a893",this.block,this.collection[0]["value"]["schema"]))
+      return postsF;
+    }
   }
 
   getPage(): any {
