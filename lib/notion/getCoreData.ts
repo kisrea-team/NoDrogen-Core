@@ -156,9 +156,14 @@ export class Notion extends Nodrogen {
         switch (this.collection[0]["value"]["schema"][key]?.type) {
           case "date": {
             let dateProperty: any = getDateValue(val);
+            
+            let batchDate = new Date(dateProperty["start_date"]).getFullYear() + '年' + (new Date(dateProperty["start_date"]).getMonth() + 1) + '月' + new Date(dateProperty["start_date"]).getDate() +'日'
+
+            dateProperty["date"] = batchDate;
             // delete dateProperty.type;
             properties[this.collection[0]["value"]["schema"][key].name] =
               dateProperty;
+
             break;
           }
           case "select":
@@ -301,6 +306,7 @@ export class Notion extends Nodrogen {
       }
     }
     if (this.type && this.type == "1") {
+      console.log(years);
       return years;
     } else {
       const found = postsF.find((element) => element["Person"]);
