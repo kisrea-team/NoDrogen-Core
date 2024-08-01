@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-03-16 15:05:16
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-03-16 15:18:26
+ * @LastEditTime: 2024-08-01 10:13:46
  * @Description: 简介
  */
 import { Notion } from "../../../../lib/notion/getCoreData";
@@ -19,5 +19,8 @@ export async function GET(
   const data = await obj.getPost(slug);
   const notion = new NotionAPI();
   const record_map = await notion.getPage(slug);
+
+
+  
   return Response.json({ wiki, data, record_map });
 }
