@@ -2,7 +2,7 @@
  * @Author: zitons
  * @Date: 2024-08-01 09:57:35
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-08-01 10:23:42
+ * @LastEditTime: 2024-08-01 10:31:42
  * @Description: 简
  */
 
@@ -82,7 +82,7 @@ export async function GET() {
     //获取所有pageid
     const views = Object.values(response.collection_query)[0] as any;
     //表格次序
-    //console.log(views);
+    // console.log(response);
     let pageIds = [];
     let postsT: any[] = [];
     let postsF: any[] = [];

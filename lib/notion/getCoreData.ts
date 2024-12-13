@@ -156,8 +156,8 @@ export class Notion extends Nodrogen {
         switch (this.collection[0]["value"]["schema"][key]?.type) {
           case "date": {
             let dateProperty: any = getDateValue(val);
-            
-            let batchDate = new Date(dateProperty["start_date"]).getFullYear() + '年' + (new Date(dateProperty["start_date"]).getMonth() + 1) + '月' + new Date(dateProperty["start_date"]).getDate() +'日'
+
+            let batchDate = new Date(dateProperty["start_date"]).getFullYear() + '年' + (new Date(dateProperty["start_date"]).getMonth() + 1) + '月' + new Date(dateProperty["start_date"]).getDate() + '日'
 
             dateProperty["date"] = batchDate;
             // delete dateProperty.type;
@@ -255,15 +255,16 @@ export class Notion extends Nodrogen {
     postsT = [...posts];
     // const mainUser = postsT.find((element) => element > 10);
 
-    let filterPosts = postsT.sort(
-      (objA: any, objB: any) =>
-        new Date(
-          objB?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
-        ).getTime() -
-        new Date(
-          objA?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
-        ).getTime()
-    );
+    // let filterPosts = postsT.sort(
+    //   (objA: any, objB: any) =>
+    //     new Date(
+    //       objB?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
+    //     ).getTime() -
+    //     new Date(
+    //       objA?.["value"]["properties"][this.dateName][0][1][0][1]["start_date"]
+    //     ).getTime()
+    // );
+    let filterPosts = postsT
     const result = filterPosts.filter(
       (post: any) => post["value"]["properties"]?.[this.typeName]?.[0] == "精选"
     );
@@ -288,7 +289,7 @@ export class Notion extends Nodrogen {
       if (this.type && this.type == "1") {
         var item = new Date(
           filterPosts[i]["value"]["properties"][this.dateName][0][1][0][1][
-            "start_date"
+          "start_date"
           ]
         ).getFullYear();
         var year = item.toString();
